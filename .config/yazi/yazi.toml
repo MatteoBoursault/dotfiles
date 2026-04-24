@@ -1,0 +1,47 @@
+[mgr]
+ratio = [1, 2, 7]
+show_hidden = true
+show_symlink = true
+sort_by = "natural"
+sort_dir_first = true
+linemode = "size_and_mtime"
+
+# [open]
+# prepend_rules = [
+#   { mime = "inode/directory", use = "open" },
+# ]
+# append_rules = [
+# 	{ url = "*", use = "open" },
+# ]
+
+[opener]
+edit = [
+  { run = "$EDITOR %s", block = true },
+]
+open = [
+  { run = "handlr open %s", desc = "Open" },
+]
+
+[[plugin.prepend_previewers]]
+url = "*.tar*"
+run = 'piper --format=url -- tar tf "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*.csv"
+run = 'piper -- bat -p --color=always "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*.md"
+run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"'
+
+[[plugin.prepend_previewers]]
+url = "*/"
+run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"'
+
+[[plugin.prepend_previewers]]
+mime = "application/sqlite3"
+run  = 'piper -- sqlite3 "$1" ".schema --indent"'
+
+[[plugin.append_previewers]]
+url = "*"
+run = 'piper -- hexyl --border=none --terminal-width=$w "$1"'

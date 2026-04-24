@@ -1,0 +1,75 @@
+# ===========================================
+# Stratégie : tout ignorer, whitelister au cas par cas
+# ===========================================
+*
+
+# ---- Fichiers projet ----
+!install.sh
+!README.md
+
+# ---- Shell ----
+!.bashrc
+!.bash_profile
+!.zshrc
+!.zshenv
+!.profile
+!.gitconfig
+!.gitignore
+!.npmrc
+
+# ---- Config applicative ----
+!.config/
+.config/*
+
+!.config/hypr/
+!.config/hypr/**
+!.config/kitty/
+!.config/kitty/**
+!.config/nvim/
+!.config/nvim/**
+!.config/btop/
+!.config/btop/**
+!.config/wofi/
+!.config/wofi/**
+!.config/yazi/
+!.config/yazi/**
+!.config/handlr/
+!.config/handlr/**
+!.config/theme/
+!.config/theme/**
+!.config/package_list.txt
+
+# Exclure les fichiers générés dans les dossiers whitelistés
+.config/nvim/nvim-pack-lock.json
+.config/nvim/.luacheckrc
+.config/nvim/.luarc.json
+.config/QtProject.conf
+.config/kdeglobals
+.config/yazi/plugins/
+
+# ---- Scripts perso ----
+!.local/
+.local/*
+!.local/bin/
+!.local/bin/**
+
+# ---- Pi ----
+# !.pi/
+# .pi/*
+# !.pi/agent/extensions/
+# !.pi/agent/extensions/**
+# !.pi/agent/skills/
+# !.pi/agent/skills/**
+# !.pi/agent/prompts/
+# !.pi/agent/prompts/**
+# !.pi/agent/AGENTS.md
+# !.pi/agent/settings.json
+
+# ---- Toujours ignorer ----
+.secrets.env
+.npm-global/
+.cache/
+.cargo/
+.rustup/
+.oh-my-zsh/
+node_modules/

@@ -1,0 +1,8 @@
+[mgr]
+prepend_keymap = [
+  { on = "h", run = "leave", desc = "Back to the parent directory" },
+  { on = "t", run = "arrow next", desc = "Next line" },
+  { on = "n", run = "arrow prev", desc = "Previous line" },
+  { on = "s", run = "enter", desc = "Enter the child directory" },
+  { on = "q", run = 'shell "$SHELL" --block', desc = "Open $SHELL here" },
+]
