@@ -7,7 +7,7 @@ source $ZSH/oh-my-zsh.sh
 # Environment variables
 export EDITOR=nvim
 export VAULT_PATH=$HOME/my_vault
-export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH$PATH"
 
 # Secrets
 [[ -f ~/.secrets.env ]] && source ~/.secrets.env

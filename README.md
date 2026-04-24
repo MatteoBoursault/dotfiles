@@ -46,3 +46,15 @@ chmod +x install.sh
 ├── .local/bin/        # Scripts perso
 └── install.sh         # Script de bootstrap
 ```
+
+## Thèmes
+
+Couleurs + police partagées entre kitty, hyprland, wofi et yazi via un
+script central :
+
+```bash
+~/.config/theme/apply-theme.sh gruvbox
+```
+
+Voir [`.config/theme/README.md`](.config/theme/README.md) pour les détails
+(structure, conventions, ajout de thèmes/outils).

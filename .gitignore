@@ -46,6 +46,12 @@
 .config/QtProject.conf
 .config/kdeglobals
 .config/yazi/plugins/
+.config/yazi/theme.toml
+.config/wofi/style.css
+.config/theme/.current-theme
+.config/theme/kitty.conf
+.config/theme/hypr.conf
+.config/theme/*.jpg
 
 # ---- Scripts perso ----
 !.local/
