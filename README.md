@@ -82,7 +82,7 @@ conflits :
 | Kitty | `Ctrl+Shift` | Panes, onglets |
 | Neovim | *(natif)* | Mouvements curseur |
 
-### Kitty — référence rapide (`Ctrl+Shift`)
+### Kitty
 
 **Panes**
 
@@ -106,7 +106,6 @@ conflits :
 | `Ctrl+Shift+U` | Onglet suivant |
 | `Ctrl+Shift+W` | Fermer l'onglet |
 | `Ctrl+Shift+R` | Renommer l'onglet |
-| `Ctrl+Shift+1-5` | Aller à l'onglet N |
 
 **Scrollback**
 
@@ -116,7 +115,7 @@ conflits :
 | `Ctrl+Shift+Z` | Prompt précédent |
 | `Ctrl+Shift+X` | Prompt suivant |
 
-### Hyprland — référence rapide
+### Hyprland
 
 **`Super`**
 
@@ -166,5 +165,3 @@ conflits :
 | `Leader+gd` | Aller à la définition |
 | `Leader+ca` | Code action |
 | `Leader+rn` | Renommer symbole |
-| `Leader+ss` | Sauvegarder session |
-| `Leader+sl` | Charger une session |
