@@ -7,7 +7,7 @@ source $ZSH/oh-my-zsh.sh
 # Environment variables
 export EDITOR=nvim
 export VAULT_PATH=$HOME/my_vault
-export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH$PATH"
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
 
 # Secrets
 [[ -f ~/.secrets.env ]] && source ~/.secrets.env
@@ -16,8 +16,8 @@ export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH$PATH"
 alias ll="ls -lha"
 alias xx="xdg-open"
 
-alias azerty="sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = azerty' ~/.config/hypr/hyprland.conf"
-alias dvp="sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = dvp' ~/.config/hypr/hyprland.conf"
+alias azerty="sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = azerty.conf/' ~/.config/hypr/hyprland.conf && hyprctl reload"
+alias dvp="sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = dvp.conf/' ~/.config/hypr/hyprland.conf && hyprctl reload"
 
 alias save_package_list="paru -Qe > ~/.config/package_list.txt"
 
