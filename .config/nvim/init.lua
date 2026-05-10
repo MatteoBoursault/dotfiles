@@ -36,6 +36,62 @@ for _, name in ipairs({
 end
 
 -- =============================================================================
+-- LANGUAGES
+-- =============================================================================
+
+local lua_ls_cfg = { settings = { Lua = {
+  diagnostics = { globals = { "vim" } },
+  telemetry   = { enable = false },
+}}}
+
+local languages = {
+  --             [1] ft                            [2] ext                    [3] ts            [4] lsp                 [5] lint          [6] fmt
+  lua        = { {"lua"},                          {"*.lua"},                 {"lua"},          {"lua_ls", lua_ls_cfg}, {"luacheck"},     {"stylua"}       },
+  python     = { {"python"},                       {"*.py"},                  {"python"},       {"pyright", {}},        {"flake8"},       {"black"}        },
+  javascript = { {"javascript","javascriptreact"}, {"*.js","*.jsx"},          {"javascript"},   {"ts_ls", {}},          {"eslint_d"},     {"prettier_d"}   },
+  typescript = { {"typescript","typescriptreact"}, {"*.ts","*.tsx"},          {"typescript"},   {"ts_ls", {}},          {"eslint_d"},     {"prettier_d"}   },
+  json       = { {"json","jsonc"},                 {"*.json"},                {},               {},                     {"eslint_d"},     {"fixjson"}      },
+  rust       = { {"rust"},                         {"*.rs"},                  {"rust"},         {"rust_analyzer", {}},  {},               {"rustfmt"}      },
+  c          = { {"c"},                            {"*.c","*.h"},             {"c"},            {"clangd", {}},         {"cpplint"},      {"clang_format"} },
+  cpp        = { {"cpp"},                          {"*.cpp","*.hpp"},         {"cpp"},          {"clangd", {}},         {"cpplint"},      {"clang_format"} },
+  css        = { {"css","scss"},                   {"*.css","*.scss"},        {"css"},          {},                     {},               {"prettier_d"}   },
+  html       = { {"html"},                         {"*.html"},                {"html"},         {},                     {},               {"prettier_d"}   },
+  bash       = { {"sh"},                           {"*.sh","*.bash","*.zsh"}, {"bash"},         {"bashls", {}},         {"shellcheck"},   {"shfmt"}        },
+  markdown   = { {"markdown"},                     {},                        {"markdown"},     {"marksman", {}},       {"markdownlint"}, {}               },
+  vim        = { {},                               {},                        {"vim","vimdoc"}, {},                     {},               {}               },
+}
+
+-- On construit toutes les listes consommées plus bas (autocmd format-on-save, treesitter, LSP, efm).
+local extensions, ts_parsers = {}, {}
+local efm_filetypes, efm_languages = {}, {}
+local lsp_servers = {}
+
+for _, l in pairs(languages) do
+  vim.list_extend(extensions, l[2])
+  vim.list_extend(ts_parsers, l[3])
+
+  if l[4][1] then
+    lsp_servers[l[4][1]] = l[4][2]
+  end
+
+  if #l[5] > 0 or #l[6] > 0 then
+    local tools = {}
+    for _, x in ipairs(l[5]) do tools[#tools+1] = require("efmls-configs.linters."    .. x) end
+    for _, x in ipairs(l[6]) do tools[#tools+1] = require("efmls-configs.formatters." .. x) end
+    for _, ft in ipairs(l[1]) do
+      efm_languages[ft] = tools
+      efm_filetypes[#efm_filetypes+1] = ft
+    end
+  end
+end
+
+lsp_servers.efm = {
+  filetypes    = efm_filetypes,
+  init_options = { documentFormatting = true },
+  settings     = { languages = efm_languages },
+}
+
+-- =============================================================================
 -- OPTIONS
 -- =============================================================================
 
@@ -70,7 +126,7 @@ vim.opt.hlsearch   = false
 
 -- UI / divers
 vim.opt.signcolumn    = "yes"
-vim.opt.colorcolumn   = "120"
+-- vim.opt.colorcolumn   = "120"
 vim.opt.showmatch     = true
 vim.opt.cmdheight     = 1
 vim.opt.completeopt   = "menuone,noinsert,noselect"
@@ -136,96 +192,6 @@ local function vmap(lhs, rhs, desc)  map("v",          lhs, rhs, { desc = desc, 
 local function nvmap(lhs, rhs, desc) map({ "n", "v" }, lhs, rhs, { desc = desc, silent = true, noremap = true }) end
 
 -- =============================================================================
--- STATUSLINE
--- =============================================================================
-
--- Branche git — 100 % async via vim.system(), jamais bloquante dans le redraw.
--- La fonction git_branch() ne fait que LIRE le cache ; le rafraîchissement
--- se déclenche sur quelques événements ponctuels.
-local cached_branch = ""
-local refreshing    = false
-local function refresh_git_branch()
-	if refreshing then return end
-	refreshing = true
-	vim.system(
-		{ "git", "branch", "--show-current" },
-		{ text = true },
-		vim.schedule_wrap(function(obj)
-			refreshing = false
-			cached_branch = (obj.code == 0) and (obj.stdout or ""):gsub("\n", "") or ""
-			vim.cmd("redrawstatus")
-		end)
-	)
-end
-
-local function git_branch()
-	return cached_branch ~= "" and (" \u{e725} " .. cached_branch .. " ") or ""
-end
-
-vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "DirChanged" }, {
-	callback = refresh_git_branch,
-})
-
--- Type de fichier + icône via mini.icons
-local function file_type()
-	local ft = vim.bo.filetype
-	if ft == "" then return MiniIcons.get("default", "file") .. " " end
-	return MiniIcons.get("filetype", ft) .. " " .. ft .. " "
-end
-
--- Taille du fichier formatée
-local function file_size()
-	local size = vim.fn.getfsize(vim.fn.expand("%"))
-	if size < 0 then return "" end
-	if size < 1024 then return string.format(" \u{f016} %dB ", size) end
-	if size < 1024 * 1024 then return string.format(" \u{f016} %.1fK ", size / 1024) end
-	return string.format(" \u{f016} %.1fM ", size / 1024 / 1024)
-end
-
--- Indicateur de mode (NORMAL / INSERT / VISUAL / ...)
-local mode_map = {
-	n      = " \u{f121}  NORMAL",
-	i      = " \u{f11c}  INSERT",
-	v      = " \u{f0168} VISUAL",
-	V      = " \u{f0168} V-LINE",
-	["\22"]= " \u{f0168} V-BLOCK", -- \22 = Ctrl-V
-	c      = " \u{f120} COMMAND",
-	s      = " \u{f0c5} SELECT",
-	S      = " \u{f0c5} S-LINE",
-	["\19"]= " \u{f0c5} S-BLOCK",  -- \19 = Ctrl-S
-	R      = " \u{f044} REPLACE",
-	r      = " \u{f044} REPLACE",
-	["!"]  = " \u{f489} SHELL",
-	t      = " \u{f120} TERMINAL",
-}
-local function mode_icon()
-	return mode_map[vim.fn.mode()] or (" \u{f059} " .. vim.fn.mode())
-end
-
--- Exposition globale pour pouvoir appeler ces fonctions depuis 'statusline'
-_G.mode_icon  = mode_icon
-_G.git_branch = git_branch
-_G.file_type  = file_type
-_G.file_size  = file_size
-
-vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
-
-local statusline = table.concat({
-	"  ",
-	"%#StatusLineBold#%{v:lua.mode_icon()}%#StatusLine#",
-	" \u{e0b1} %f %h%m%r",                  -- ▏ + nom de fichier + flags
-	"%{v:lua.git_branch()}",
-	"\u{e0b1} %{v:lua.file_type()}",
-	"\u{e0b1} %{v:lua.file_size()}",
-	"%=",                                   -- aligne ce qui suit à droite
-	" \u{f017} %l:%c  %P ",                 -- ligne:colonne + pourcentage
-})
-
-vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
-	callback = function() vim.opt_local.statusline = statusline end,
-})
-
--- =============================================================================
 -- KEYMAPS
 -- =============================================================================
 
@@ -286,11 +252,7 @@ local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 -- spéciaux (terminaux, quickfix, etc.).
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = augroup,
-	pattern = {
-		"*.lua","*.py","*.go","*.js","*.jsx","*.ts","*.tsx","*.json",
-		"*.css","*.scss","*.html","*.sh","*.bash","*.zsh",
-		"*.c","*.cpp","*.h","*.hpp",
-	},
+	pattern = extensions,
 	callback = function(args)
 		-- Filtres défensifs
 		if vim.bo[args.buf].buftype ~= "" then return end            -- buffer non-fichier
@@ -352,14 +314,9 @@ do
 	local treesitter = require("nvim-treesitter")
 	treesitter.setup({})
 
-	local ensure_installed = {
-		"vim", "vimdoc", "rust", "c", "cpp", "go", "html", "css",
-		"javascript", "json", "lua", "markdown", "python",
-		"typescript", "vue", "svelte", "bash",
-	}
 	local already = require("nvim-treesitter.config").get_installed()
 	local todo = {}
-	for _, p in ipairs(ensure_installed) do
+	for _, p in ipairs(ts_parsers) do
 		if not vim.tbl_contains(already, p) then table.insert(todo, p) end
 	end
 	if #todo > 0 then treesitter.install(todo) end
@@ -516,73 +473,97 @@ vim.lsp.config["*"] = {
 	capabilities = require("blink.cmp").get_lsp_capabilities(),
 }
 
--- efm-langserver : "umbrella" qui agrège linters et formatters externes
--- (un seul client LSP pour flake8, prettier, stylua, etc.)
-local efm_config
-do
-	local luacheck     = require("efmls-configs.linters.luacheck")
-	local stylua       = require("efmls-configs.formatters.stylua")
-	local flake8       = require("efmls-configs.linters.flake8")
-	local black        = require("efmls-configs.formatters.black")
-	local eslint_d     = require("efmls-configs.linters.eslint_d")
-	local prettier_d   = require("efmls-configs.formatters.prettier_d")
-	local fixjson      = require("efmls-configs.formatters.fixjson")
-	local shellcheck   = require("efmls-configs.linters.shellcheck")
-	local shfmt        = require("efmls-configs.formatters.shfmt")
-	local cpplint      = require("efmls-configs.linters.cpplint")
-	local clang_format = require("efmls-configs.formatters.clang_format")
-	local rustfmt      = require("efmls-configs.formatters.rustfmt")
-	local markdownlint = require("efmls-configs.linters.markdownlint")
+-- Les configurations LSP (y compris efm) sont dérivées de `languages` en
+-- haut de fichier. On ne fait ici que les enregistrer et les activer.
+for name, cfg in pairs(lsp_servers) do vim.lsp.config(name, cfg) end
+vim.lsp.enable(vim.tbl_keys(lsp_servers))
 
-	efm_config = {
-		filetypes = {
-			"c", "cpp", "css", "go", "html", "javascript", "javascriptreact",
-			"json", "jsonc", "lua", "markdown", "python", "rust", "sh",
-			"typescript", "typescriptreact", "vue", "svelte",
-		},
-		init_options = { documentFormatting = true },
-		settings = {
-			languages = {
-				c               = { clang_format, cpplint },
-				cpp             = { clang_format, cpplint },
-				css             = { prettier_d },
-				html            = { prettier_d },
-				javascript      = { eslint_d, prettier_d },
-				javascriptreact = { eslint_d, prettier_d },
-				json            = { eslint_d, fixjson },
-				jsonc           = { eslint_d, fixjson },
-				lua             = { luacheck, stylua },
-				markdown        = { markdownlint },
-				rust            = { rustfmt },
-				python          = { flake8, black },
-				sh              = { shellcheck, shfmt },
-				typescript      = { eslint_d, prettier_d },
-				typescriptreact = { eslint_d, prettier_d },
-				vue             = { eslint_d, prettier_d },
-				svelte          = { eslint_d, prettier_d },
-			},
-		},
-	}
+-- =============================================================================
+-- STATUSLINE
+-- =============================================================================
+
+-- Branche git — 100 % async via vim.system(), jamais bloquante dans le redraw.
+-- La fonction git_branch() ne fait que LIRE le cache ; le rafraîchissement
+-- se déclenche sur quelques événements ponctuels.
+local cached_branch = ""
+local refreshing    = false
+local function refresh_git_branch()
+	if refreshing then return end
+	refreshing = true
+	vim.system(
+		{ "git", "branch", "--show-current" },
+		{ text = true },
+		vim.schedule_wrap(function(obj)
+			refreshing = false
+			cached_branch = (obj.code == 0) and (obj.stdout or ""):gsub("\n", "") or ""
+			vim.cmd("redrawstatus")
+		end)
+	)
 end
 
--- Configurations LSP par langage (source de vérité unique : la table `servers`)
-local servers = {
-	lua_ls = {
-		settings = {
-			Lua = {
-				diagnostics = { globals = { "vim" } },
-				telemetry   = { enable = false },
-			},
-		},
-	},
-	pyright       = {},
-	bashls        = {},
-	ts_ls         = {},
-	rust_analyzer = {},
-	clangd        = {},
-	marksman      = {},
-	efm           = efm_config,
-}
+local function git_branch()
+	return cached_branch ~= "" and (" \u{e725} " .. cached_branch .. " ") or ""
+end
 
-for name, cfg in pairs(servers) do vim.lsp.config(name, cfg) end
-vim.lsp.enable(vim.tbl_keys(servers))
+vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "DirChanged" }, {
+	callback = refresh_git_branch,
+})
+
+-- Type de fichier + icône via mini.icons
+local function file_type()
+	local ft = vim.bo.filetype
+	if ft == "" then return MiniIcons.get("default", "file") .. " " end
+	return MiniIcons.get("filetype", ft) .. " " .. ft .. " "
+end
+
+-- Taille du fichier formatée
+local function file_size()
+	local size = vim.fn.getfsize(vim.fn.expand("%"))
+	if size < 0 then return "" end
+	if size < 1024 then return string.format(" \u{f016} %dB ", size) end
+	if size < 1024 * 1024 then return string.format(" \u{f016} %.1fK ", size / 1024) end
+	return string.format(" \u{f016} %.1fM ", size / 1024 / 1024)
+end
+
+-- Indicateur de mode (NORMAL / INSERT / VISUAL / ...)
+local mode_map = {
+	n      = " \u{f121}  NORMAL",
+	i      = " \u{f11c}  INSERT",
+	v      = " \u{f0168} VISUAL",
+	V      = " \u{f0168} V-LINE",
+	["\22"]= " \u{f0168} V-BLOCK", -- \22 = Ctrl-V
+	c      = " \u{f120} COMMAND",
+	s      = " \u{f0c5} SELECT",
+	S      = " \u{f0c5} S-LINE",
+	["\19"]= " \u{f0c5} S-BLOCK",  -- \19 = Ctrl-S
+	R      = " \u{f044} REPLACE",
+	r      = " \u{f044} REPLACE",
+	["!"]  = " \u{f489} SHELL",
+	t      = " \u{f120} TERMINAL",
+}
+local function mode_icon()
+	return mode_map[vim.fn.mode()] or (" \u{f059} " .. vim.fn.mode())
+end
+
+-- Exposition globale pour pouvoir appeler ces fonctions depuis 'statusline'
+_G.mode_icon  = mode_icon
+_G.git_branch = git_branch
+_G.file_type  = file_type
+_G.file_size  = file_size
+
+vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
+
+local statusline = table.concat({
+	"  ",
+	"%#StatusLineBold#%{v:lua.mode_icon()}%#StatusLine#",
+	" \u{e0b1} %f %h%m%r",                  -- ▏ + nom de fichier + flags
+	"%{v:lua.git_branch()}",
+	"\u{e0b1} %{v:lua.file_type()}",
+	"\u{e0b1} %{v:lua.file_size()}",
+	"%=",                                   -- aligne ce qui suit à droite
+	" \u{f017} %l:%c  %P ",                 -- ligne:colonne + pourcentage
+})
+
+vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
+	callback = function() vim.opt_local.statusline = statusline end,
+})
