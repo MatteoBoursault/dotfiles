@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Applique un thème à kitty, hyprland, wofi et yazi.
+# Applique un thème à kitty, hyprland, wofi et yazi et starship.
 #
 # Usage:
 #   apply-theme.sh <nom>     # ex: apply-theme.sh gruvbox
@@ -52,5 +52,6 @@ render "$THEME_DIR/templates/hypr.conf.tmpl"       "$THEME_DIR/hypr.conf"
 render "$THEME_DIR/templates/kitty.conf.tmpl"      "$THEME_DIR/kitty.conf"
 render "$THEME_DIR/templates/wofi-style.css.tmpl"  "$HOME/.config/wofi/style.css"
 render "$THEME_DIR/templates/yazi-theme.toml.tmpl" "$HOME/.config/yazi/theme.toml"
+render "$THEME_DIR/templates/starship.toml.tmpl"   "$HOME/.config/starship/starship.toml"
 
 hyprctl reload

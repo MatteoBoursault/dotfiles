@@ -1,0 +1,129 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$line_break$character
+"""
+right_format = """
+$duration\
+$jobs\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$docker_context\
+$time\
+$battery
+"""
+add_newline = false
+
+scan_timeout = 1000
+command_timeout = 7000
+
+palette = 'current_theme'
+
+[palettes.current_theme]
+bg0     = '#${BG0}'
+bg1     = '#${BG1}'
+bg2     = '#${BG2}'
+bg3     = '#${BG3}'
+bg4     = '#${BG4}'
+bg5     = '#${BG5}'
+fg0     = '#${FG0}'
+fg1     = '#${FG1}'
+fg2     = '#${FG2}'
+fg3     = '#${FG3}'
+red     = '#${RED}'
+green   = '#${GREEN}'
+yellow  = '#${YELLOW}'
+blue    = '#${BLUE}'
+magenta = '#${MAGENTA}'
+cyan    = '#${CYAN}'
+orange  = '#${ORANGE}'
+purple  = '#${PURPLE}'
+accent  = '#${ACCENT}'
+border  = '#${BORDER}'
+
+[line_break]
+disabled = false
+
+[character]
+success_symbol = '[➜](bold green) '
+error_symbol = '[✗](bold red) '
+
+[cmd_duration]
+disabled = false
+min_time = 20
+style = 'bg0'
+format = '[$duration]($style) '
+
+[jobs]
+disabled = false
+threshold = 1
+symbol = ''
+style = 'bg0'
+format = '[$symbol$number]($style) '
+
+[docker_context]
+symbol = ''
+style = 'blue'
+format = '[$symbol$context]($style)'
+
+[directory]
+truncation_length = 3
+truncation_symbol = ' '
+truncate_to_repo = true
+style = 'yellow'
+format = '[$path]($style) '
+
+[git_branch]
+symbol = ''
+truncation_length = 24
+truncation_symbol = ''
+style = 'fg0'
+format = '[$symbol$branch]($style) '
+
+[git_status]
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+style = 'fg1'
+format = '([\[$all_status$ahead_behind\]]($style) )'
+
+[git_state]
+style = 'purple'
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+[time]
+disabled = false
+time_format = '%T'
+style = 'cyan'
+format = '[$time]($style) '
+
+[battery]
+disabled = false
+full_symbol = '󰁹'
+charging_symbol = '󰂄'
+discharging_symbol = '󰂃'
+unknown_symbol = '󰂑'
+empty_symbol = '󰂎'
+format = '[$symbol$percentage]($style)'
+
+[[battery.display]]
+threshold = 100
+style = 'green'
+discharging_symbol = '󰁹'
+
+[[battery.display]]
+threshold = 80
+style = 'green'
+discharging_symbol = '󰁽'
+
+[[battery.display]]
+threshold = 30
+style = 'bold orange'
+discharging_symbol = '󰁽'
+
+[[battery.display]]
+threshold = 10
+style = 'bold red'
+discharging_symbol = '󰂎'

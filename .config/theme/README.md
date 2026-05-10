@@ -1,7 +1,7 @@
 # Theme
 
 Système de thèmes centralisé pour mes dotfiles. Un seul fichier de palette
-définit les couleurs et la police pour kitty, hyprland, wofi et yazi.
+définit les couleurs et la police pour kitty, hyprland, wofi, yazi et starship.
 
 ## Usage
 
@@ -32,15 +32,11 @@ Le script ne fait **aucun rechargement** (hormis `hyprctl reload` pour Hyprland)
 │   ├── hypr.conf.tmpl
 │   ├── kitty.conf.tmpl
 │   ├── wofi-style.css.tmpl
-│   └── yazi-theme.toml.tmpl
+│   └── ...
 ├── apply-theme.sh           # envsubst sur les templates
 ├── hypr.conf      ─┐
 └── kitty.conf     ─┴ fichiers générés (ne pas éditer)
 ```
-
-Fichiers aussi générés ailleurs :
-- `~/.config/wofi/style.css`
-- `~/.config/yazi/theme.toml`
 
 Les configs des outils pointent vers les fichiers générés :
 - `hyprland.conf` : `source = ~/.config/theme/hypr.conf`

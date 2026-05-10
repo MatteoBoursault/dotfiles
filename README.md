@@ -12,6 +12,7 @@ Config perso pour Arch Linux + Hyprland.
 | Yazi | `.config/yazi/` |
 | Wofi | `.config/wofi/` |
 | Btop | `.config/btop/` |
+| Starship | `.config/starship/` |
 | Handlr | `.config/handlr/` |
 | Zsh | `.zshrc`, `.zshenv` (starship, zoxide, eza) |
 | Bash | `.bashrc`, `.bash_profile` |
@@ -40,6 +41,7 @@ chmod +x install.sh
 │   ├── yazi/          # Gestionnaire de fichiers
 │   ├── wofi/          # Lanceur
 │   ├── btop/          # Moniteur système
+│   ├── starship/      # Prompt
 │   ├── handlr/        # Associations de fichiers
 │   ├── theme/         # Système de thèmes
 │   └── package_list.txt
@@ -49,14 +51,14 @@ chmod +x install.sh
 
 ## Thèmes
 
-Couleurs + police partagées entre kitty, hyprland, wofi et yazi via un
+Couleurs + police partagées entre kitty, hyprland, wofi, yazi et starship via un
 script central :
 
 ```bash
 ~/.config/theme/apply-theme.sh gruvbox
 ```
 
-Voir [`.config/theme/README.md`](.config/theme/README.md) pour les détails
+Voir [`~/.config/theme/README.md`](~/.config/theme/README.md) pour les détails
 (structure, conventions, ajout de thèmes/outils).
 
 ## Convention de navigation — layout DVP

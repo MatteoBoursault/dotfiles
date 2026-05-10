@@ -40,6 +40,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive
 export EDITOR=nvim
 export VAULT_PATH=$HOME/my_vault
 export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 
 # Secrets
 [[ -f ~/.secrets.env ]] && source ~/.secrets.env
