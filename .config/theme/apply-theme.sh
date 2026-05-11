@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Applique un thème à kitty, hyprland, wofi et yazi et starship.
+# Applique un thème (palette ANSI 16 couleurs) à kitty, hyprland, wofi,
+# yazi, starship et neovim.
 #
 # Usage:
 #   apply-theme.sh <nom>     # ex: apply-theme.sh gruvbox
@@ -10,11 +11,9 @@ set -euo pipefail
 
 THEME_DIR="$HOME/.config/theme"
 CURRENT_FILE="$THEME_DIR/.current-theme"
-VARS='${BG0} ${BG1} ${BG2} ${BG3} ${BG4} ${BG5}
-      ${FG0} ${FG1} ${FG2} ${FG3}
-      ${RED} ${GREEN} ${YELLOW} ${BLUE} ${MAGENTA} ${CYAN} ${ORANGE} ${PURPLE}
-      ${ACCENT} ${BORDER}
-      ${FONT_MONO} ${FONT_MONO_SIZE}'
+KEYS=(base00 base01 base02 base03 base04 base05 base06 base07
+      base08 base09 base0A base0B base0C base0D base0E base0F
+      font font_size)
 
 list_themes() {
     find "$THEME_DIR/themes" -maxdepth 1 -name '*.env' -printf '%f\n' | sed 's/\.env$//' | sort
@@ -43,15 +42,18 @@ source "$THEME_FILE"
 set +a
 
 render() {
-    mkdir -p "$(dirname "$2")"
-    envsubst "$VARS" < "$1" > "$2"
+    local sed_args=()
+    for key in "${KEYS[@]}"; do
+        sed_args+=(-e "s|{{${key}}}|${!key}|g")
+    done
+    sed "${sed_args[@]}" "$1" > "$2"
 }
 
 echo "Thème: $THEME"
-render "$THEME_DIR/templates/hypr.conf.tmpl"       "$THEME_DIR/hypr.conf"
-render "$THEME_DIR/templates/kitty.conf.tmpl"      "$THEME_DIR/kitty.conf"
-render "$THEME_DIR/templates/wofi-style.css.tmpl"  "$HOME/.config/wofi/style.css"
-render "$THEME_DIR/templates/yazi-theme.toml.tmpl" "$HOME/.config/yazi/theme.toml"
-render "$THEME_DIR/templates/starship.toml.tmpl"   "$HOME/.config/starship/starship.toml"
+render "$THEME_DIR/templates/hypr.tmpl"  "$HOME/.config/hypr/theme.conf"
+render "$THEME_DIR/templates/kitty.tmpl" "$HOME/.config/kitty/theme.conf"
+render "$THEME_DIR/templates/wofi.tmpl"  "$HOME/.config/wofi/style.css"
+render "$THEME_DIR/templates/nvim.tmpl"  "$HOME/.config/nvim/lua/colors.lua"
+echo "$THEME" > "$CURRENT_FILE"
 
 hyprctl reload

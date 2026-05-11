@@ -58,7 +58,7 @@ script central :
 ~/.config/theme/apply-theme.sh gruvbox
 ```
 
-Voir [`~/.config/theme/README.md`](~/.config/theme/README.md) pour les détails
+Voir [`.config/theme/README.md`](.config/theme/README.md) pour les détails
 (structure, conventions, ajout de thèmes/outils).
 
 ## Convention de navigation — layout DVP

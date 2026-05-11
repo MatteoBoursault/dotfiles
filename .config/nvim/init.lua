@@ -98,7 +98,7 @@ lsp_servers.efm = {
 vim.opt.mouse = ""
 
 -- Apparence
-vim.cmd.colorscheme("desert")
+require("colors")
 vim.opt.termguicolors = true
 vim.opt.background    = "dark"
 
