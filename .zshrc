@@ -8,10 +8,23 @@ source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.config/zsh/plugins/you-should-use/you-should-use.plugin.zsh
 
 # ==============================================================================
-# PROMPT
+# ENVIRONMENT
 # ==============================================================================
 
-eval "$(starship init zsh)"
+export EDITOR=nvim
+export VAULT_PATH=$HOME/my_vault
+export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+
+# Secrets
+[[ -f ~/.secrets.env ]] && source ~/.secrets.env
+
+# ==============================================================================
+# INIT
+# ==============================================================================
+
+eval "$(starship init zsh)" # prompt
+eval "$(atuin init zsh)"    # command line completion
 
 # ==============================================================================
 # OPTIONS ZSH
@@ -28,39 +41,27 @@ HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 
-# Complétion
+# Completion
 autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive
 
 # ==============================================================================
-# ENVIRONMENT
-# ==============================================================================
-
-export EDITOR=nvim
-export VAULT_PATH=$HOME/my_vault
-export PATH="$HOME/.npm-global/bin:$HOME/.local/bin:$PATH"
-export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
-
-# Secrets
-[[ -f ~/.secrets.env ]] && source ~/.secrets.env
-
-# ==============================================================================
 # OUTILS
 # ==============================================================================
 
-# zoxide — cd intelligent (remplace cd)
+# zoxide (cd)
 eval "$(zoxide init zsh --cmd cd)"
 
-# ==============================================================================
-# ALIASES
-# ==============================================================================
-
-# Navigation
+# eza (ls)
 alias ll="eza -la --icons --git --group-directories-first"
 alias lt="eza -la --icons --tree --level=2 --group-directories-first"
 alias ls="eza --icons --group-directories-first"
 alias xx="xdg-open"
+
+# ==============================================================================
+# SCRIPTS
+# ==============================================================================
 
 # Hyprland — switch keymap
 alias azerty="sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = azerty.conf/' ~/.config/hypr/hyprland.conf && hyprctl reload"
@@ -82,5 +83,3 @@ template() {
 }
 
 alias daily="template $VAULT_PATH/templates/carnet_de_bord/daily-note.md"
-
-

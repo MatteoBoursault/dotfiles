@@ -39,6 +39,8 @@
 !.config/theme/**
 !.config/starship/
 !.config/starship/**
+!.config/atuin/
+!.config/atuin/**
 !.config/package_list.txt
 
 # Exclure les fichiers générés dans les dossiers whitelistés
