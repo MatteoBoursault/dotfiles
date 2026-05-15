@@ -12,7 +12,7 @@ if command -v paru &>/dev/null; then
   npm install -g @mariozechner/pi-coding-agent
 
   echo ">> Application du thème..."
-  ~/.config/theme/apply-theme.sh gruvbox
+  ~/.config/theme/apply-theme.sh da-one-gray
 
 else
     echo "!! paru non trouvé"
