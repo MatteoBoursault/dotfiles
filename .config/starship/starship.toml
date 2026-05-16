@@ -35,14 +35,12 @@ format = '[$duration]($style) '
 [jobs]
 disabled = false
 threshold = 1
-symbol = ''
 style = 'black'
-format = '[$symbol$number]($style) '
+format = '[$number]($style) '
 
 [docker_context]
-symbol = ''
 style = 'blue'
-format = '[$symbol$context]($style)'
+format = '[$context]($style)'
 
 [directory]
 truncation_length = 3
@@ -52,11 +50,10 @@ style = 'yellow'
 format = '[$path]($style) '
 
 [git_branch]
-symbol = ''
 truncation_length = 24
 truncation_symbol = ''
 style = 'foreground'
-format = '[$symbol$branch]($style) '
+format = '[$branch]($style) '
 
 [git_status]
 ahead = '⇡${count}'
