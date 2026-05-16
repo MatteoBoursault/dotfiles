@@ -32,32 +32,31 @@ eval "$(atuin init zsh)"    # command line completion
 
 setopt AUTO_CD              # taper un répertoire = cd
 setopt CORRECT              # suggestion de correction
-setopt HIST_IGNORE_DUPS     # pas de doublons dans l'historique
-setopt HIST_IGNORE_SPACE    # commande précédée d'un espace = pas dans l'historique
-setopt SHARE_HISTORY        # partager l'historique entre sessions
-setopt EXTENDED_HISTORY     # timestamp dans l'historique
-
-HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
-
-# Completion
-autoload -Uz compinit && compinit
-zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive
 
 # ==============================================================================
 # OUTILS
 # ==============================================================================
 
-# zoxide (cd)
-eval "$(zoxide init zsh --cmd cd)"
-
-# eza (ls)
-alias ll="eza -la --icons --git --group-directories-first"
+eval "$(zoxide init zsh --cmd cd)"                                    # zoxide (cd)
+alias ll="eza -la --icons --git --group-directories-first"            # eza (ls)
 alias lt="eza -la --icons --tree --level=2 --group-directories-first"
 alias ls="eza --icons --group-directories-first"
-alias xx="xdg-open"
+
+alias ps="procs"                                                      # procs (ps)
+alias htop="btop"                                                     # btop (htop)
+alias netw="bandwich"                                                 # bandwich => network monitoring
+
+alias ddocker="lazydocker"                                            # lazydocker (docker)
+alias ggit="lazygit"                                                  # lazygit (git)
+
+alias find="fd"                                                       # fd (find)
+ffind() { fd "$1" / --hidden --no-ignore }
+alias grep="rg"                                                       # rg (grep)
+rrg() { rg "$1" --hidden --no-ignore }
+
+alias mman="tldr"                                                     # tldr (man)
+alias regex="grex"                                                    # grex => regex generator
+alias xx="handlr open"                                                # open
 
 # ==============================================================================
 # SCRIPTS
@@ -70,10 +69,7 @@ alias dvp="sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = dvp.conf/' 
 # Maintenance
 alias save_package_list="paru -Qe > ~/.config/package_list.txt"
 
-# ==============================================================================
-# FONCTIONS
-# ==============================================================================
-
+# Journaling
 template() {
   sed \
   "s/{{date:MM-YYYY}}/$(date +%m-%Y)/g; \
