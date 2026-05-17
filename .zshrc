@@ -27,6 +27,18 @@ eval "$(starship init zsh)" # prompt
 eval "$(atuin init zsh)"    # command line completion
 
 # ==============================================================================
+# VI MODE
+# ==============================================================================
+# Activer keymap vi
+bindkey -v
+
+# Remapper les touches en mode normal
+bindkey -M vicmd 'h' backward-char
+bindkey -M vicmd 't' atuin-up-search
+bindkey -M vicmd 'n' atuin-up-search
+bindkey -M vicmd 's' forward-char
+
+# ==============================================================================
 # OPTIONS ZSH
 # ==============================================================================
 
