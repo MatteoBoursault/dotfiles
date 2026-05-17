@@ -218,16 +218,22 @@ nvmap("s", "l", "Right")
 -- Splits
 nmap("<leader>sv", ":vsplit<CR>", "Split vertical")
 nmap("<leader>sh", ":split<CR>",  "Split horizontal")
-nmap("<C-h>",      "<C-w>h",      "Fenêtre à gauche")
-nmap("<C-t>",      "<C-w>j",      "Fenêtre du bas")
-nmap("<C-n>",      "<C-w>k",      "Fenêtre du haut")
-nmap("<C-s>",      "<C-w>l",      "Fenêtre à droite")
+--[[
+-- Géré par kitty, voir :
+-- https://notpeerreviewed.com/blog/nvim-kitty/
+-- https://gist.github.com/JonathanArns/6a9b40c568cf3ebe49beb25960c6147a
+
+nmap("<C-h>", "<C-w>h", "Fenêtre à gauche")
+nmap("<C-t>", "<C-w>j", "Fenêtre du bas")
+nmap("<C-n>", "<C-w>k", "Fenêtre du haut")
+nmap("<C-s>", "<C-w>l", "Fenêtre à droite")
 
 -- Resize
 nmap("<C-Up>",    ":resize +2<CR>",          "Hauteur +")
 nmap("<C-Down>",  ":resize -2<CR>",          "Hauteur -")
 nmap("<C-Left>",  ":vertical resize -2<CR>", "Largeur -")
 nmap("<C-Right>", ":vertical resize +2<CR>", "Largeur +")
+]]
 
 -- Indentation visuelle persistante
 vmap("<", "<gv", "Désindenter et reselectionner")
