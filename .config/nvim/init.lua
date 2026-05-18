@@ -6,7 +6,8 @@
 vim.pack.add({
 	"https://www.github.com/echasnovski/mini.nvim",
 	"https://www.github.com/ibhagwan/fzf-lua",
-	"https://www.github.com/nvim-tree/nvim-tree.lua",
+  "https://github.com/nvim-lua/plenary.nvim", -- yazi dependencie
+  "mikavilpas/yazi.nvim",
 	{
 		src = "https://github.com/nvim-treesitter/nvim-treesitter",
 		branch = "main",
@@ -25,7 +26,8 @@ for _, name in ipairs({
 	"nvim-treesitter",
   "mini.nvim",
   "fzf-lua",
-  "nvim-tree.lua",
+  "plenary.nvim",
+  "yazi.nvim",
 	"nvim-lspconfig",
   "mason.nvim",
   "efmls-configs-nvim",
@@ -101,6 +103,7 @@ vim.opt.mouse = ""
 require("colors")
 vim.opt.termguicolors = true
 vim.opt.background    = "dark"
+vim.opt.winborder     = "none"
 
 -- Numérotation & curseur
 vim.opt.number         = true
@@ -338,13 +341,18 @@ do
 	})
 end
 
--- nvim-tree
-require("nvim-tree").setup({
-	view     = { width = 35 },
-	filters  = { dotfiles = false },
-	renderer = { group_empty = true },
+-- yazi
+require("yazi").setup({
+  open_for_directories = true,
+  floating_window_scaling_factor = 0.9,
+  keymaps = {
+    open_file_in_vertical_split   = "<C-v>",
+    open_file_in_horizontal_split = "<C-b>",
+    open_file_in_tab              = "<C-t>", -- TODO : need fix
+    send_to_quickfix_list         = "<C-q>",
+  },
 })
-nmap("<leader>e", function() require("nvim-tree.api").tree.toggle() end, "Toggle NvimTree")
+nmap("<leader>-", ":Yazi<CR>", "Open yazi at current file")
 
 -- fzf-lua
 local fzf = require("fzf-lua")
@@ -374,7 +382,7 @@ require("mini.move").setup({
 })
 require("mini.trailspace").setup({})      -- highlight des espaces de fin de ligne
 require("mini.notify").setup({})          -- vim.notify non bloquant
-require("mini.icons").setup({})           -- icônes (consommé par nvim-tree, fzf-lua, statusline)
+require("mini.icons").setup({})           -- icônes (fzf-lua, statusline)
 
 -- =============================================================================
 -- LSP, LINTING, FORMATTING & COMPLETION
