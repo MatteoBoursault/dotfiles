@@ -7,12 +7,8 @@
 !install.sh
 !README.md
 
-# ---- Shell ----
+# ---- Divers ----
 !.bashrc
-!.bash_profile
-!.zshrc
-!.zshenv
-!.profile
 !.gitconfig
 !.gitignore
 !.npmrc
@@ -39,8 +35,8 @@
 !.config/theme/**
 !.config/starship/
 !.config/starship/**
-!.config/atuin/
-!.config/atuin/**
+!.config/nushell/
+!.config/nushell/**
 !.config/package_list.txt
 
 # Exclure les fichiers générés dans les dossiers whitelistés
@@ -55,6 +51,7 @@
 .config/wofi/style.css
 .config/kitty/theme.conf
 .config/hypr/theme.conf
+.config/nushell/history.*
 .config/theme/.current-theme
 .config/theme/*.jpg
 
