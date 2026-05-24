@@ -6,17 +6,17 @@
 vim.pack.add({
 	"https://www.github.com/echasnovski/mini.nvim",
 	"https://www.github.com/ibhagwan/fzf-lua",
-  "https://github.com/nvim-lua/plenary.nvim", -- yazi dependencie
-  "mikavilpas/yazi.nvim",
+	"https://github.com/nvim-lua/plenary.nvim", -- yazi dependencie
+	"mikavilpas/yazi.nvim",
 	{
 		src = "https://github.com/nvim-treesitter/nvim-treesitter",
 		branch = "main",
 		build = ":TSUpdate",
 	},
 	-- Stack LSP / complétion
-	"https://www.github.com/neovim/nvim-lspconfig",
 	"https://github.com/mason-org/mason.nvim",
-	"https://github.com/creativenull/efmls-configs-nvim",
+	"https://github.com/stevearc/conform.nvim",
+	"https://github.com/mfussenegger/nvim-lint",
 	{ src = "https://github.com/saghen/blink.cmp", version = vim.version.range("1.*") },
 	"https://github.com/L3MON4D3/LuaSnip",
 })
@@ -24,15 +24,15 @@ vim.pack.add({
 -- packadd : charge effectivement chaque plugin dans le runtime.
 for _, name in ipairs({
 	"nvim-treesitter",
-  "mini.nvim",
-  "fzf-lua",
-  "plenary.nvim",
-  "yazi.nvim",
-	"nvim-lspconfig",
-  "mason.nvim",
-  "efmls-configs-nvim",
-  "blink.cmp",
-  "LuaSnip",
+	"mini.nvim",
+	"fzf-lua",
+	"plenary.nvim",
+	"yazi.nvim",
+	"mason.nvim",
+	"conform.nvim",
+	"nvim-lint",
+	"blink.cmp",
+	"LuaSnip",
 }) do
 	vim.cmd("packadd " .. name)
 end
@@ -41,57 +41,52 @@ end
 -- LANGUAGES
 -- =============================================================================
 
-local lua_ls_cfg = { settings = { Lua = {
-  diagnostics = { globals = { "vim" } },
-  telemetry   = { enable = false },
-}}}
-
+-- [1] ft  [2] ext  [3] ts  [4] linter  [5] formatter  [6] {lsp, config}  --  false = non applicable
+-- stylua: ignore
 local languages = {
-  --             [1] ft                            [2] ext                    [3] ts            [4] lsp                 [5] lint          [6] fmt
-  lua        = { {"lua"},                          {"*.lua"},                 {"lua"},          {"lua_ls", lua_ls_cfg}, {"luacheck"},     {"stylua"}       },
-  python     = { {"python"},                       {"*.py"},                  {"python"},       {"pyright", {}},        {"flake8"},       {"black"}        },
-  javascript = { {"javascript","javascriptreact"}, {"*.js","*.jsx"},          {"javascript"},   {"ts_ls", {}},          {"eslint_d"},     {"prettier_d"}   },
-  typescript = { {"typescript","typescriptreact"}, {"*.ts","*.tsx"},          {"typescript"},   {"ts_ls", {}},          {"eslint_d"},     {"prettier_d"}   },
-  json       = { {"json","jsonc"},                 {"*.json"},                {},               {},                     {"eslint_d"},     {"fixjson"}      },
-  rust       = { {"rust"},                         {"*.rs"},                  {"rust"},         {"rust_analyzer", {}},  {},               {"rustfmt"}      },
-  c          = { {"c"},                            {"*.c","*.h"},             {"c"},            {"clangd", {}},         {"cpplint"},      {"clang_format"} },
-  cpp        = { {"cpp"},                          {"*.cpp","*.hpp"},         {"cpp"},          {"clangd", {}},         {"cpplint"},      {"clang_format"} },
-  css        = { {"css","scss"},                   {"*.css","*.scss"},        {"css"},          {},                     {},               {"prettier_d"}   },
-  html       = { {"html"},                         {"*.html"},                {"html"},         {},                     {},               {"prettier_d"}   },
-  bash       = { {"sh"},                           {"*.sh","*.bash","*.zsh"}, {"bash"},         {"bashls", {}},         {"shellcheck"},   {"shfmt"}        },
-  markdown   = { {"markdown"},                     {},                        {"markdown"},     {"marksman", {}},       {"markdownlint"}, {}               },
-  vim        = { {},                               {},                        {"vim","vimdoc"}, {},                     {},               {}               },
+	--             [1] ft            [2] ext                    [3] ts        [4] linter      [5] fmt         [6] {lsp, config}
+	lua        = { {"lua"},          {"*.lua"},                 "lua",        "luacheck",     "stylua",       {"lua_ls",        {cmd={"lua-language-server"},                  root_markers={".luarc.json",".git"}, settings={Lua={diagnostics={globals={"vim"}}, telemetry={enable=false}}}}} },
+	python     = { {"python"},       {"*.py"},                  "python",     "flake8",       "black",        {"pyright",       {cmd={"pyright-langserver","--stdio"},         root_markers={"pyproject.toml","setup.py",".git"}}}                                                             },
+	javascript = { {"javascript"},   {"*.js"},                  "javascript", "eslint_d",     "prettierd",    {"ts_ls",         {cmd={"typescript-language-server","--stdio"}, root_markers={"package.json","tsconfig.json",".git"}}}                                                          },
+	typescript = { {"typescript"},   {"*.ts"},                  "typescript", "eslint_d",     "prettierd",    {"ts_ls",         {cmd={"typescript-language-server","--stdio"}, root_markers={"package.json","tsconfig.json",".git"}}}                                                          },
+	json       = { {"json","jsonc"}, {"*.json"},                false,        "eslint_d",     "fixjson",      false                                                                                                                                                                            },
+	rust       = { {"rust"},         {"*.rs"},                  "rust",       false,          "rustfmt",      {"rust_analyzer", {cmd={"rust-analyzer"},                        root_markers={"Cargo.toml",".git"}}}                                                                            },
+	c          = { {"c"},            {"*.c","*.h"},             "c",          "cpplint",      "clang_format", {"clangd",        {cmd={"clangd"},                               root_markers={"compile_commands.json",".clangd",".git"}}}                                                       },
+	cpp        = { {"cpp"},          {"*.cpp","*.hpp"},         "cpp",        "cpplint",      "clang_format", {"clangd",        {cmd={"clangd"},                               root_markers={"compile_commands.json",".clangd",".git"}}}                                                       },
+	css        = { {"css","scss"},   {"*.css","*.scss"},        "css",        false,          "prettierd",    false                                                                                                                                                                            },
+	html       = { {"html"},         {"*.html"},                "html",       false,          "prettierd",    false                                                                                                                                                                            },
+	bash       = { {"sh"},           {"*.sh","*.bash","*.zsh"}, "bash",       "shellcheck",   "shfmt",        {"bashls",        {cmd={"bash-language-server","start"},         root_markers={".git"}}}                                                                                         },
+	nushell    = { {"nu"},           {},                        "nu",         false,          false,          {"nushell",       {cmd={"nu","--lsp"},                           root_markers={".git"}}}                                                                                         },
+	markdown   = { {"markdown"},     {},                        "markdown",   "markdownlint", false,          {"marksman",      {cmd={"marksman","server"},                    root_markers={".marksman.toml",".git"}}}                                                                        },
+	vim        = { {},               {},                        "vim",        false,          false,          false                                                                                                                                                                            },
 }
 
--- On construit toutes les listes consommées plus bas (autocmd format-on-save, treesitter, LSP, efm).
-local extensions, ts_parsers = {}, {}
-local efm_filetypes, efm_languages = {}, {}
+-- On construit toutes les listes consommées plus bas.
+local extensions = {}
+local ts_parsers = {}
 local lsp_servers = {}
+local conform_formatters = {}
+local lint_linters = {}
 
 for _, l in pairs(languages) do
-  vim.list_extend(extensions, l[2])
-  vim.list_extend(ts_parsers, l[3])
+	vim.list_extend(extensions, l[2])
+	if l[3] then
+		table.insert(ts_parsers, l[3])
+	end
 
-  if l[4][1] then
-    lsp_servers[l[4][1]] = l[4][2]
-  end
+	if l[6] then
+		lsp_servers[l[6][1]] = vim.tbl_extend("force", { filetypes = l[1] }, l[6][2])
+	end
 
-  if #l[5] > 0 or #l[6] > 0 then
-    local tools = {}
-    for _, x in ipairs(l[5]) do tools[#tools+1] = require("efmls-configs.linters."    .. x) end
-    for _, x in ipairs(l[6]) do tools[#tools+1] = require("efmls-configs.formatters." .. x) end
-    for _, ft in ipairs(l[1]) do
-      efm_languages[ft] = tools
-      efm_filetypes[#efm_filetypes+1] = ft
-    end
-  end
+	for _, ft in ipairs(l[1]) do
+		if l[5] then
+			conform_formatters[ft] = { l[5] }
+		end
+		if l[4] then
+			lint_linters[ft] = { l[4] }
+		end
+	end
 end
-
-lsp_servers.efm = {
-  filetypes    = efm_filetypes,
-  init_options = { documentFormatting = true },
-  settings     = { languages = efm_languages },
-}
 
 -- =============================================================================
 -- OPTIONS
@@ -102,44 +97,44 @@ vim.opt.mouse = ""
 -- Apparence
 require("colors")
 vim.opt.termguicolors = true
-vim.opt.background    = "dark"
-vim.opt.winborder     = "none"
+vim.opt.background = "dark"
+vim.opt.winborder = "none"
 
 -- Numérotation & curseur
-vim.opt.number         = true
+vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.cursorline     = true
-vim.opt.wrap           = false
-vim.opt.scrolloff      = 10
-vim.opt.sidescrolloff  = 10
+vim.opt.cursorline = true
+vim.opt.wrap = false
+vim.opt.scrolloff = 10
+vim.opt.sidescrolloff = 10
 
 -- Indentation
-vim.opt.tabstop     = 2
-vim.opt.shiftwidth  = 2
+vim.opt.tabstop = 2
+vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
-vim.opt.expandtab   = true
+vim.opt.expandtab = true
 vim.opt.smartindent = true
-vim.opt.autoindent  = true
+vim.opt.autoindent = true
 
 -- Recherche
 vim.opt.ignorecase = true
-vim.opt.smartcase  = true
-vim.opt.incsearch  = true
-vim.opt.hlsearch   = false
+vim.opt.smartcase = true
+vim.opt.incsearch = true
+vim.opt.hlsearch = false
 
 -- UI / divers
-vim.opt.signcolumn    = "yes"
+vim.opt.signcolumn = "yes"
 -- vim.opt.colorcolumn   = "120"
-vim.opt.showmatch     = true
-vim.opt.cmdheight     = 1
-vim.opt.completeopt   = "menuone,noinsert,noselect"
-vim.opt.showmode      = false
-vim.opt.pumheight     = 10
-vim.opt.pumblend      = 10
-vim.opt.winblend      = 0
-vim.opt.conceallevel  = 0
+vim.opt.showmatch = true
+vim.opt.cmdheight = 1
+vim.opt.completeopt = "menuone,noinsert,noselect"
+vim.opt.showmode = false
+vim.opt.pumheight = 10
+vim.opt.pumblend = 10
+vim.opt.winblend = 0
+vim.opt.conceallevel = 0
 vim.opt.concealcursor = ""
-vim.opt.fillchars     = { eob = " " }
+vim.opt.fillchars = { eob = " " }
 
 -- Persistance des undos
 local undodir = vim.fn.expand("~/.vim/undodir")
@@ -147,42 +142,43 @@ if vim.fn.isdirectory(undodir) == 0 then
 	vim.fn.mkdir(undodir, "p")
 end
 
-vim.opt.backup      = false
+vim.opt.backup = false
 vim.opt.writebackup = false
-vim.opt.swapfile    = false
-vim.opt.undofile    = true
-vim.opt.undodir     = undodir
-vim.opt.updatetime  = 300
-vim.opt.timeoutlen  = 500
+vim.opt.swapfile = false
+vim.opt.undofile = true
+vim.opt.undodir = undodir
+vim.opt.updatetime = 300
+vim.opt.timeoutlen = 500
 vim.opt.ttimeoutlen = 50
-vim.opt.autoread    = true
-vim.opt.autowrite   = false
+vim.opt.autoread = true
+vim.opt.autowrite = false
 
-vim.opt.hidden     = true
+vim.opt.hidden = true
 vim.opt.errorbells = false
-vim.opt.backspace  = "indent,eol,start"
-vim.opt.autochdir  = false
+vim.opt.backspace = "indent,eol,start"
+vim.opt.autochdir = false
 vim.opt.iskeyword:append("-")
 vim.opt.path:append("**")
-vim.opt.selection  = "inclusive"
+vim.opt.selection = "inclusive"
 vim.opt.clipboard:append("unnamedplus")
 vim.opt.modifiable = true
-vim.opt.encoding   = "utf-8"
+vim.opt.encoding = "utf-8"
 
-vim.opt.guicursor = "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
+vim.opt.guicursor =
+	"n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 
 -- Folding via Treesitter
 vim.opt.foldmethod = "expr"
-vim.opt.foldexpr   = "v:lua.vim.treesitter.foldexpr()"
-vim.opt.foldlevel  = 99
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldlevel = 99
 
 -- Splits & wildmenu
-vim.opt.splitbelow    = true
-vim.opt.splitright    = true
-vim.opt.wildmenu      = true
-vim.opt.wildmode      = "longest:full,full"
+vim.opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.wildmenu = true
+vim.opt.wildmode = "longest:full,full"
 vim.opt.diffopt:append("linematch:60")
-vim.opt.redrawtime    = 10000
+vim.opt.redrawtime = 10000
 vim.opt.maxmempattern = 20000
 
 -- =============================================================================
@@ -190,37 +186,45 @@ vim.opt.maxmempattern = 20000
 -- =============================================================================
 
 local map = vim.keymap.set
-local function nmap(lhs, rhs, desc)  map("n",          lhs, rhs, { desc = desc, silent = true, noremap = true }) end
-local function vmap(lhs, rhs, desc)  map("v",          lhs, rhs, { desc = desc, silent = true, noremap = true }) end
-local function nvmap(lhs, rhs, desc) map({ "n", "v" }, lhs, rhs, { desc = desc, silent = true, noremap = true }) end
+local function nmap(lhs, rhs, desc)
+	map("n", lhs, rhs, { desc = desc, silent = true, noremap = true })
+end
+local function vmap(lhs, rhs, desc)
+	map("v", lhs, rhs, { desc = desc, silent = true, noremap = true })
+end
+local function nvmap(lhs, rhs, desc)
+	map({ "n", "v" }, lhs, rhs, { desc = desc, silent = true, noremap = true })
+end
 
 -- =============================================================================
 -- KEYMAPS
 -- =============================================================================
 
-vim.g.mapleader      = " "
+vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Recherche & demi-pages centrées
-nmap("l",     "nzzzv",   "Résultat suivant (centré)")
-nmap("L",     "Nzzzv",   "Résultat précédent (centré)")
+nmap("l", "nzzzv", "Résultat suivant (centré)")
+nmap("L", "Nzzzv", "Résultat précédent (centré)")
 nmap("<C-d>", "<C-d>zz", "Demi-page bas (centré)")
 nmap("<C-u>", "<C-u>zz", "Demi-page haut (centré)")
 
 -- Buffers
-nmap("<leader>bl", ":bnext<CR>",     "Buffer suivant")
+nmap("<leader>bl", ":bnext<CR>", "Buffer suivant")
 nmap("<leader>bp", ":bprevious<CR>", "Buffer précédent")
 
 -- Navigation
-map({ "n", "v" }, "t", function() return vim.v.count == 0 and "gj" or "j" end,
-	{ expr = true, silent = true, noremap = true, desc = "Down (wrap-aware)" })
-map({ "n", "v" }, "n", function() return vim.v.count == 0 and "gk" or "k" end,
-	{ expr = true, silent = true, noremap = true, desc = "Up (wrap-aware)" })
+map({ "n", "v" }, "t", function()
+	return vim.v.count == 0 and "gj" or "j"
+end, { expr = true, silent = true, noremap = true, desc = "Down (wrap-aware)" })
+map({ "n", "v" }, "n", function()
+	return vim.v.count == 0 and "gk" or "k"
+end, { expr = true, silent = true, noremap = true, desc = "Up (wrap-aware)" })
 nvmap("s", "l", "Right")
 
 -- Splits
 nmap("<leader>sv", ":vsplit<CR>", "Split vertical")
-nmap("<leader>sh", ":split<CR>",  "Split horizontal")
+nmap("<leader>sh", ":split<CR>", "Split horizontal")
 --[[
 -- Géré par kitty, voir :
 -- https://notpeerreviewed.com/blog/nvim-kitty/
@@ -245,7 +249,9 @@ vmap(">", ">gv", "Indenter et reselectionner")
 -- Divers
 nmap("J", "mzJ`z", "Joindre les lignes en gardant la position du curseur")
 
-nmap("<leader>td", function() vim.diagnostic.enable(not vim.diagnostic.is_enabled()) end,	"Toggle diagnostics")
+nmap("<leader>td", function()
+	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, "Toggle diagnostics")
 
 nmap("<leader>q", ":q!<CR>", "Quitter (force)")
 nmap("<leader>w", ":wq<CR>", "Sauver et quitter")
@@ -256,36 +262,21 @@ nmap("<leader>w", ":wq<CR>", "Sauver et quitter")
 
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
--- Format on save (uniquement les vrais buffers de fichier, et seulement si
--- efm-langserver est attaché). Évite les prompts d'écriture sur les buffers
--- spéciaux (terminaux, quickfix, etc.).
+-- Format on save via conform.nvim (gère lui-même les gardes buftype/modifiable).
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = augroup,
 	pattern = extensions,
 	callback = function(args)
-		-- Filtres défensifs
-		if vim.bo[args.buf].buftype ~= "" then return end            -- buffer non-fichier
-		if not vim.bo[args.buf].modifiable then return end           -- read-only
-		if vim.api.nvim_buf_get_name(args.buf) == "" then return end -- pas de nom
-
-		local has_efm = false
-		for _, c in ipairs(vim.lsp.get_clients({ bufnr = args.buf })) do
-			if c.name == "efm" then has_efm = true; break end
-		end
-		if not has_efm then return end
-
-		pcall(vim.lsp.buf.format, {
-			bufnr      = args.buf,
-			timeout_ms = 2000,
-			filter     = function(c) return c.name == "efm" end,
-		})
+		require("conform").format({ bufnr = args.buf, timeout_ms = 2000 })
 	end,
 })
 
 -- Flash visuel après un yank
 vim.api.nvim_create_autocmd("TextYankPost", {
 	group = augroup,
-	callback = function() vim.hl.on_yank() end,
+	callback = function()
+		vim.hl.on_yank()
+	end,
 })
 
 -- Restaure la position du curseur à l'ouverture d'un fichier
@@ -294,10 +285,14 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 	group = augroup,
 	desc = "Restore last cursor position",
 	callback = function()
-		if vim.o.diff then return end
-		local last_pos  = vim.api.nvim_buf_get_mark(0, '"')
+		if vim.o.diff then
+			return
+		end
+		local last_pos = vim.api.nvim_buf_get_mark(0, '"')
 		local last_line = vim.api.nvim_buf_line_count(0)
-		if last_pos[1] < 1 or last_pos[1] > last_line then return end
+		if last_pos[1] < 1 or last_pos[1] > last_line then
+			return
+		end
 		pcall(vim.api.nvim_win_set_cursor, 0, last_pos)
 	end,
 })
@@ -307,7 +302,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	group = augroup,
 	pattern = { "markdown", "text", "gitcommit" },
 	callback = function()
-		vim.opt_local.wrap      = true
+		vim.opt_local.wrap = true
 		vim.opt_local.linebreak = true
 	end,
 })
@@ -326,9 +321,13 @@ do
 	local already = require("nvim-treesitter.config").get_installed()
 	local todo = {}
 	for _, p in ipairs(ts_parsers) do
-		if not vim.tbl_contains(already, p) then table.insert(todo, p) end
+		if not vim.tbl_contains(already, p) then
+			table.insert(todo, p)
+		end
 	end
-	if #todo > 0 then treesitter.install(todo) end
+	if #todo > 0 then
+		treesitter.install(todo)
+	end
 
 	local group = vim.api.nvim_create_augroup("TreeSitterConfig", { clear = true })
 	vim.api.nvim_create_autocmd("FileType", {
@@ -343,14 +342,14 @@ end
 
 -- yazi
 require("yazi").setup({
-  open_for_directories = true,
-  floating_window_scaling_factor = 0.9,
-  keymaps = {
-    open_file_in_vertical_split   = "<C-v>",
-    open_file_in_horizontal_split = "<C-b>",
-    open_file_in_tab              = "<C-t>", -- TODO : need fix
-    send_to_quickfix_list         = "<C-q>",
-  },
+	open_for_directories = true,
+	floating_window_scaling_factor = 0.9,
+	keymaps = {
+		open_file_in_vertical_split = "<C-v>",
+		open_file_in_horizontal_split = "<C-b>",
+		open_file_in_tab = "<C-t>", -- TODO : need fix
+		send_to_quickfix_list = "<C-q>",
+	},
 })
 nmap("<leader>-", ":Yazi<CR>", "Open yazi at current file")
 
@@ -358,31 +357,31 @@ nmap("<leader>-", ":Yazi<CR>", "Open yazi at current file")
 local fzf = require("fzf-lua")
 fzf.setup({})
 
-nmap("<leader>ff", fzf.files,                 "FZF Files")
-nmap("<leader>fg", fzf.live_grep,             "FZF Live Grep")
-nmap("<leader>fb", fzf.buffers,               "FZF Buffers")
-nmap("<leader>fh", fzf.help_tags,             "FZF Help Tags")
-nmap("<leader>fx", fzf.diagnostics_document,  "FZF Diags Doc")
+nmap("<leader>ff", fzf.files, "FZF Files")
+nmap("<leader>fg", fzf.live_grep, "FZF Live Grep")
+nmap("<leader>fb", fzf.buffers, "FZF Buffers")
+nmap("<leader>fh", fzf.help_tags, "FZF Help Tags")
+nmap("<leader>fx", fzf.diagnostics_document, "FZF Diags Doc")
 nmap("<leader>fX", fzf.diagnostics_workspace, "FZF Diags WS")
 
 -- Écosystème mini.nvim
-require("mini.comment").setup({})         -- gcc, gc<motion>
+require("mini.comment").setup({}) -- gcc, gc<motion>
 require("mini.move").setup({
 	mappings = {
-		left       = "<A-h>",
-    down       = "<A-t>",
-    up         = "<A-n>",
-    right      = "<A-s>",
-		line_left  = "<A-h>",
-    line_down  = "<A-t>",
-    line_up    = "<A-n>",
-    line_right = "<A-s>",
+		left = "<A-h>",
+		down = "<A-t>",
+		up = "<A-n>",
+		right = "<A-s>",
+		line_left = "<A-h>",
+		line_down = "<A-t>",
+		line_up = "<A-n>",
+		line_right = "<A-s>",
 	},
 	options = { reindent_linewise = true },
 })
-require("mini.trailspace").setup({})      -- highlight des espaces de fin de ligne
-require("mini.notify").setup({})          -- vim.notify non bloquant
-require("mini.icons").setup({})           -- icônes (fzf-lua, statusline)
+require("mini.trailspace").setup({}) -- highlight des espaces de fin de ligne
+require("mini.notify").setup({}) -- vim.notify non bloquant
+require("mini.icons").setup({}) -- icônes (fzf-lua, statusline)
 
 -- =============================================================================
 -- LSP, LINTING, FORMATTING & COMPLETION
@@ -398,30 +397,34 @@ vim.diagnostic.config({
 	signs = {
 		text = {
 			[vim.diagnostic.severity.ERROR] = diagnostic_signs.Error,
-			[vim.diagnostic.severity.WARN]  = diagnostic_signs.Warn,
-			[vim.diagnostic.severity.INFO]  = diagnostic_signs.Info,
-			[vim.diagnostic.severity.HINT]  = diagnostic_signs.Hint,
+			[vim.diagnostic.severity.WARN] = diagnostic_signs.Warn,
+			[vim.diagnostic.severity.INFO] = diagnostic_signs.Info,
+			[vim.diagnostic.severity.HINT] = diagnostic_signs.Hint,
 		},
 	},
-	underline        = true,
+	underline = true,
 	update_in_insert = false,
-	severity_sort    = true,
+	severity_sort = true,
 	float = {
-		source    = "always",
-    header    = "",
-    prefix    = "",
+		source = "always",
+		header = "",
+		prefix = "",
 		focusable = false,
-    style     = "minimal",
+		style = "minimal",
 	},
 })
 
-nmap("<leader>Q",  function() vim.diagnostic.setloclist({ open = true }) end, "Liste des diagnostics")
+nmap("<leader>Q", function()
+	vim.diagnostic.setloclist({ open = true })
+end, "Liste des diagnostics")
 nmap("<leader>dl", vim.diagnostic.open_float, "Diag de la ligne")
 
 -- on_attach : keymaps appliqués UNIQUEMENT aux buffers où un LSP s'attache
 local function lsp_on_attach(ev)
 	local client = vim.lsp.get_client_by_id(ev.data.client_id)
-	if not client then return end
+	if not client then
+		return
+	end
 	local bufnr = ev.buf
 
 	local function bmap(lhs, rhs, desc)
@@ -429,35 +432,53 @@ local function lsp_on_attach(ev)
 	end
 
 	-- Goto / refactor
-	bmap("<leader>gd", function() fzf.lsp_definitions({ jump_to_single_result = true }) end,  "Definition (fzf)")
-	bmap("<leader>gD", vim.lsp.buf.definition,                                                "Definition")
-	bmap("<leader>gS", function() vim.cmd("vsplit"); vim.lsp.buf.definition() end,            "Definition (vsplit)")
-	bmap("<leader>ca", vim.lsp.buf.code_action,                                               "Code action")
-	bmap("<leader>rn", vim.lsp.buf.rename,                                                    "Rename")
-	bmap("K",          vim.lsp.buf.hover,                                                     "Hover")
+	bmap("<leader>gd", function()
+		fzf.lsp_definitions({ jump_to_single_result = true })
+	end, "Definition (fzf)")
+	bmap("<leader>gD", vim.lsp.buf.definition, "Definition")
+	bmap("<leader>gS", function()
+		vim.cmd("vsplit")
+		vim.lsp.buf.definition()
+	end, "Definition (vsplit)")
+	bmap("<leader>ca", vim.lsp.buf.code_action, "Code action")
+	bmap("<leader>rn", vim.lsp.buf.rename, "Rename")
+	bmap("K", vim.lsp.buf.hover, "Hover")
 
 	-- Diagnostics ciblés
-	bmap("<leader>D",  function() vim.diagnostic.open_float({ scope = "line"   }) end, "Diag ligne")
-	bmap("<leader>d",  function() vim.diagnostic.open_float({ scope = "cursor" }) end, "Diag curseur")
-	bmap("<leader>nd", function() vim.diagnostic.jump({ count =  1 }) end,             "Diag suivant")
-	bmap("<leader>pd", function() vim.diagnostic.jump({ count = -1 }) end,             "Diag précédent")
+	bmap("<leader>D", function()
+		vim.diagnostic.open_float({ scope = "line" })
+	end, "Diag ligne")
+	bmap("<leader>d", function()
+		vim.diagnostic.open_float({ scope = "cursor" })
+	end, "Diag curseur")
+	bmap("<leader>nd", function()
+		vim.diagnostic.jump({ count = 1 })
+	end, "Diag suivant")
+	bmap("<leader>pd", function()
+		vim.diagnostic.jump({ count = -1 })
+	end, "Diag précédent")
 
 	-- Recherches LSP via fzf
-	bmap("<leader>fd", function() fzf.lsp_definitions({ jump_to_single_result = true }) end, "Definitions")
-	bmap("<leader>fr", fzf.lsp_references,                                                   "References")
-	bmap("<leader>ft", fzf.lsp_typedefs,                                                     "Type defs")
-	bmap("<leader>fs", fzf.lsp_document_symbols,                                             "Document symbols")
-	bmap("<leader>fw", fzf.lsp_workspace_symbols,                                            "Workspace symbols")
-	bmap("<leader>fi", fzf.lsp_implementations,                                              "Implementations")
+	bmap("<leader>fd", function()
+		fzf.lsp_definitions({ jump_to_single_result = true })
+	end, "Definitions")
+	bmap("<leader>fr", fzf.lsp_references, "References")
+	bmap("<leader>ft", fzf.lsp_typedefs, "Type defs")
+	bmap("<leader>fs", fzf.lsp_document_symbols, "Document symbols")
+	bmap("<leader>fw", fzf.lsp_workspace_symbols, "Workspace symbols")
+	bmap("<leader>fi", fzf.lsp_implementations, "Implementations")
 
 	-- Organize imports + format dans la foulée
 	if client:supports_method("textDocument/codeAction", bufnr) then
 		bmap("<leader>oi", function()
 			vim.lsp.buf.code_action({
 				context = { only = { "source.organizeImports" }, diagnostics = {} },
-				apply = true, bufnr = bufnr,
+				apply = true,
+				bufnr = bufnr,
 			})
-			vim.defer_fn(function() vim.lsp.buf.format({ bufnr = bufnr }) end, 50)
+			vim.defer_fn(function()
+				vim.lsp.buf.format({ bufnr = bufnr })
+			end, 50)
 		end, "Organize imports")
 	end
 end
@@ -467,19 +488,23 @@ vim.api.nvim_create_autocmd("LspAttach", { group = augroup, callback = lsp_on_at
 -- blink.cmp (moteur de complétion)
 require("blink.cmp").setup({
 	keymap = {
-		preset        = "none",
+		preset = "none",
 		["<C-Space>"] = { "show", "hide" },
-		["<CR>"]      = { "accept", "fallback" },
-		["<A-l>"]     = { "select_next", "fallback" },
-		["<A-p>"]     = { "select_prev", "fallback" },
-		["<Tab>"]     = { "snippet_forward", "fallback" },
-		["<S-Tab>"]   = { "snippet_backward", "fallback" },
+		["<CR>"] = { "accept", "fallback" },
+		["<A-l>"] = { "select_next", "fallback" },
+		["<A-p>"] = { "select_prev", "fallback" },
+		["<Tab>"] = { "snippet_forward", "fallback" },
+		["<S-Tab>"] = { "snippet_backward", "fallback" },
 	},
 	appearance = { nerd_font_variant = "mono" },
 	completion = { menu = { auto_show = true } },
-	sources    = { default = { "lsp", "path", "buffer", "snippets" } },
-	snippets   = { expand = function(snippet) require("luasnip").lsp_expand(snippet) end },
-	fuzzy      = { implementation = "prefer_rust", prebuilt_binaries = { download = true } },
+	sources = { default = { "lsp", "path", "buffer", "snippets" } },
+	snippets = {
+		expand = function(snippet)
+			require("luasnip").lsp_expand(snippet)
+		end,
+	},
+	fuzzy = { implementation = "prefer_rust", prebuilt_binaries = { download = true } },
 })
 
 -- Capabilities LSP par défaut, enrichies par blink.cmp
@@ -487,10 +512,27 @@ vim.lsp.config["*"] = {
 	capabilities = require("blink.cmp").get_lsp_capabilities(),
 }
 
--- Les configurations LSP (y compris efm) sont dérivées de `languages` en
+-- Les configurations LSP sont dérivées de `languages` en
 -- haut de fichier. On ne fait ici que les enregistrer et les activer.
-for name, cfg in pairs(lsp_servers) do vim.lsp.config(name, cfg) end
+for name, cfg in pairs(lsp_servers) do
+	vim.lsp.config(name, cfg)
+end
 vim.lsp.enable(vim.tbl_keys(lsp_servers))
+
+-- conform.nvim (formatting)
+require("conform").setup({ formatters_by_ft = conform_formatters })
+
+-- nvim-lint (linting)
+require("lint").linters_by_ft = lint_linters
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+	group = augroup,
+	callback = function()
+		local ft = vim.bo.filetype
+		if lint_linters[ft] then
+			require("lint").try_lint(lint_linters[ft])
+		end
+	end,
+})
 
 -- =============================================================================
 -- STATUSLINE
@@ -500,9 +542,11 @@ vim.lsp.enable(vim.tbl_keys(lsp_servers))
 -- La fonction git_branch() ne fait que LIRE le cache ; le rafraîchissement
 -- se déclenche sur quelques événements ponctuels.
 local cached_branch = ""
-local refreshing    = false
+local refreshing = false
 local function refresh_git_branch()
-	if refreshing then return end
+	if refreshing then
+		return
+	end
 	refreshing = true
 	vim.system(
 		{ "git", "branch", "--show-current" },
@@ -526,58 +570,68 @@ vim.api.nvim_create_autocmd({ "BufEnter", "FocusGained", "DirChanged" }, {
 -- Type de fichier + icône via mini.icons
 local function file_type()
 	local ft = vim.bo.filetype
-	if ft == "" then return MiniIcons.get("default", "file") .. " " end
+	if ft == "" then
+		return MiniIcons.get("default", "file") .. " "
+	end
 	return MiniIcons.get("filetype", ft) .. " " .. ft .. " "
 end
 
 -- Taille du fichier formatée
 local function file_size()
 	local size = vim.fn.getfsize(vim.fn.expand("%"))
-	if size < 0 then return "" end
-	if size < 1024 then return string.format(" \u{f016} %dB ", size) end
-	if size < 1024 * 1024 then return string.format(" \u{f016} %.1fK ", size / 1024) end
+	if size < 0 then
+		return ""
+	end
+	if size < 1024 then
+		return string.format(" \u{f016} %dB ", size)
+	end
+	if size < 1024 * 1024 then
+		return string.format(" \u{f016} %.1fK ", size / 1024)
+	end
 	return string.format(" \u{f016} %.1fM ", size / 1024 / 1024)
 end
 
 -- Indicateur de mode (NORMAL / INSERT / VISUAL / ...)
 local mode_map = {
-	n      = " \u{f121}  NORMAL",
-	i      = " \u{f11c}  INSERT",
-	v      = " \u{f0168} VISUAL",
-	V      = " \u{f0168} V-LINE",
-	["\22"]= " \u{f0168} V-BLOCK", -- \22 = Ctrl-V
-	c      = " \u{f120} COMMAND",
-	s      = " \u{f0c5} SELECT",
-	S      = " \u{f0c5} S-LINE",
-	["\19"]= " \u{f0c5} S-BLOCK",  -- \19 = Ctrl-S
-	R      = " \u{f044} REPLACE",
-	r      = " \u{f044} REPLACE",
-	["!"]  = " \u{f489} SHELL",
-	t      = " \u{f120} TERMINAL",
+	n = " \u{f121}  NORMAL",
+	i = " \u{f11c}  INSERT",
+	v = " \u{f0168} VISUAL",
+	V = " \u{f0168} V-LINE",
+	["\22"] = " \u{f0168} V-BLOCK", -- \22 = Ctrl-V
+	c = " \u{f120} COMMAND",
+	s = " \u{f0c5} SELECT",
+	S = " \u{f0c5} S-LINE",
+	["\19"] = " \u{f0c5} S-BLOCK", -- \19 = Ctrl-S
+	R = " \u{f044} REPLACE",
+	r = " \u{f044} REPLACE",
+	["!"] = " \u{f489} SHELL",
+	t = " \u{f120} TERMINAL",
 }
 local function mode_icon()
 	return mode_map[vim.fn.mode()] or (" \u{f059} " .. vim.fn.mode())
 end
 
 -- Exposition globale pour pouvoir appeler ces fonctions depuis 'statusline'
-_G.mode_icon  = mode_icon
+_G.mode_icon = mode_icon
 _G.git_branch = git_branch
-_G.file_type  = file_type
-_G.file_size  = file_size
+_G.file_type = file_type
+_G.file_size = file_size
 
 vim.api.nvim_set_hl(0, "StatusLineBold", { bold = true })
 
 local statusline = table.concat({
 	"  ",
 	"%#StatusLineBold#%{v:lua.mode_icon()}%#StatusLine#",
-	" \u{e0b1} %f %h%m%r",                  -- ▏ + nom de fichier + flags
+	" \u{e0b1} %f %h%m%r", -- ▏ + nom de fichier + flags
 	"%{v:lua.git_branch()}",
 	"\u{e0b1} %{v:lua.file_type()}",
 	"\u{e0b1} %{v:lua.file_size()}",
-	"%=",                                   -- aligne ce qui suit à droite
-	" \u{f017} %l:%c  %P ",                 -- ligne:colonne + pourcentage
+	"%=", -- aligne ce qui suit à droite
+	" \u{f017} %l:%c  %P ", -- ligne:colonne + pourcentage
 })
 
 vim.api.nvim_create_autocmd({ "WinEnter", "BufEnter" }, {
-	callback = function() vim.opt_local.statusline = statusline end,
+	callback = function()
+		vim.opt_local.statusline = statusline
+	end,
 })
