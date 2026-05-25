@@ -1,0 +1,15 @@
+-- Configuration clavier Programmer Dvorak
+return {
+    layout  = "us",
+    variant = "dvp",
+    
+    left_key  = "H",
+    right_key = "S",
+    down_key  = "T",
+    up_key    = "N",
+    
+    one_key   = "A",
+    two_key   = "O",
+    three_key = "E",
+    four_key  = "U",
+}

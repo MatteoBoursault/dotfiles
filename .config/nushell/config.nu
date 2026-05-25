@@ -32,7 +32,6 @@ $env.config.menus = []
 $env.config.plugins = {}
 
 
-
 # ==============================================================================
 # ENVIRONMENT
 # ==============================================================================
@@ -90,11 +89,11 @@ alias xx = handlr open                     # open
 
 # Hyprland — switch keymap
 def azerty [] {
-  sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = azerty.conf/' ~/.config/hypr/hyprland.conf ;
+  sed -i 's/^local keymaps_conf =.*$/local keymaps_conf = "azerty"/' ~/.config/hypr/hyprland.lua ;
   hyprctl reload
 }
 def dvp [] {
-  sed -i 's/^\$keymaps_conf_file =.*$/\$keymaps_conf_file = dvp.conf/' ~/.config/hypr/hyprland.conf ;
+  sed -i 's/^local keymaps_conf =.*$/local keymaps_conf = "dvp"/' ~/.config/hypr/hyprland.lua ;
   hyprctl reload
 }
 # Maintenance

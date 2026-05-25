@@ -50,7 +50,7 @@ render() {
 }
 
 echo "Thème: $THEME"
-render "$THEME_DIR/templates/hypr.tmpl"  "$HOME/.config/hypr/theme.conf"
+render "$THEME_DIR/templates/hypr.tmpl"  "$HOME/.config/hypr/theme.lua"
 render "$THEME_DIR/templates/kitty.tmpl" "$HOME/.config/kitty/theme.conf"
 render "$THEME_DIR/templates/wofi.tmpl"  "$HOME/.config/wofi/style.css"
 render "$THEME_DIR/templates/nvim.tmpl"  "$HOME/.config/nvim/lua/colors.lua"
