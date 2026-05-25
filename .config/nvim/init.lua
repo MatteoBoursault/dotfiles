@@ -262,7 +262,7 @@ nmap("<leader>w", ":wq<CR>", "Sauver et quitter")
 
 local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
--- Format on save via conform.nvim (gère lui-même les gardes buftype/modifiable).
+-- Format on save via conform.nvim
 vim.api.nvim_create_autocmd("BufWritePre", {
 	group = augroup,
 	pattern = extensions,
@@ -366,19 +366,6 @@ nmap("<leader>fX", fzf.diagnostics_workspace, "FZF Diags WS")
 
 -- Écosystème mini.nvim
 require("mini.comment").setup({}) -- gcc, gc<motion>
-require("mini.move").setup({
-	mappings = {
-		left = "<A-h>",
-		down = "<A-t>",
-		up = "<A-n>",
-		right = "<A-s>",
-		line_left = "<A-h>",
-		line_down = "<A-t>",
-		line_up = "<A-n>",
-		line_right = "<A-s>",
-	},
-	options = { reindent_linewise = true },
-})
 require("mini.trailspace").setup({}) -- highlight des espaces de fin de ligne
 require("mini.notify").setup({}) -- vim.notify non bloquant
 require("mini.icons").setup({}) -- icônes (fzf-lua, statusline)
@@ -491,10 +478,10 @@ require("blink.cmp").setup({
 		preset = "none",
 		["<C-Space>"] = { "show", "hide" },
 		["<CR>"] = { "accept", "fallback" },
-		["<A-l>"] = { "select_next", "fallback" },
-		["<A-p>"] = { "select_prev", "fallback" },
-		["<Tab>"] = { "snippet_forward", "fallback" },
-		["<S-Tab>"] = { "snippet_backward", "fallback" },
+		["<Tab>"] = { "select_next", "fallback" },
+		["<S-Tab>"] = { "select_prev", "fallback" },
+		["<A-s>"] = { "snippet_forward", "fallback" },
+		["<A-h>"] = { "snippet_backward", "fallback" },
 	},
 	appearance = { nerd_font_variant = "mono" },
 	completion = { menu = { auto_show = true } },

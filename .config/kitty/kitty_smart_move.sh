@@ -16,35 +16,35 @@ case $direction in
 	left)
 		kitty_action="neighboring_window $direction"
 		vim_action=":wincmd h\n"
-		fingerprint_kitten="window_cursor_position.py";;
+		fingerprint_kitten="kittens/window_cursor_position.py";;
 	bottom)
 		kitty_action="neighboring_window $direction"
 		vim_action=":wincmd j\n"
-		fingerprint_kitten="window_cursor_position.py";;
+		fingerprint_kitten="kittens/window_cursor_position.py";;
 	top)
 		kitty_action="neighboring_window $direction"
 		vim_action=":wincmd k\n"
-		fingerprint_kitten="window_cursor_position.py";;
+		fingerprint_kitten="kittens/window_cursor_position.py";;
 	right)
 		kitty_action="neighboring_window $direction"
 		vim_action=":wincmd l\n"
-		fingerprint_kitten="window_cursor_position.py";;
+		fingerprint_kitten="kittens/window_cursor_position.py";;
 	taller)
 		kitty_action="resize_window $direction 2"
 		vim_action=":resize +1\n"
-		fingerprint_kitten="window_hashed_text.py";;
+		fingerprint_kitten="kittens/window_hashed_text.py";;
 	shorter)
 		kitty_action="resize_window $direction 2"
 		vim_action=":resize -1\n"
-		fingerprint_kitten="window_hashed_text.py";;
+		fingerprint_kitten="kittens/window_hashed_text.py";;
 	wider)
 		kitty_action="resize_window $direction 2"
 		vim_action=":vertical resize +1\n"
-		fingerprint_kitten="window_hashed_text.py";;
+		fingerprint_kitten="kittens/window_hashed_text.py";;
 	narrower)
 		kitty_action="resize_window $direction 2"
 		vim_action=":vertical resize -1\n"
-		fingerprint_kitten="window_hashed_text.py";;
+		fingerprint_kitten="kittens/window_hashed_text.py";;
 esac
 
 function perform_vim_action {
@@ -55,7 +55,7 @@ function get_fingerprint {
 	kitten @ kitten $fingerprint_kitten $window_id
 }
 
-window_type=$(kitten @ kitten window_type.py $window_id)
+window_type=$(kitten @ kitten kittens/window_type.py $window_id)
 if [[ $window_type != "application" ]]; then
 	kitten @ action $kitty_action
 	exit 0

@@ -37,8 +37,6 @@ $env.config.plugins = {}
 # ENVIRONMENT
 # ==============================================================================
 
-$env.EDITOR = "nvim"
-
 $env.path ++= ["~/.npm-global/bin"]
 $env.path ++= ["~/.local/bin/"]
 

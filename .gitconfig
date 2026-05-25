@@ -1,3 +1,6 @@
 [user]
 	email = matteo.boursault.pro@gmail.com
-	name = matteo
+  name = matteo
+
+[diff]
+  external = difft
