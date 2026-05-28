@@ -47,7 +47,6 @@
 .config/QtProject.conf
 .config/kdeglobals
 .config/yazi/plugins/
-.config/yazi/theme.toml
 .config/wofi/style.css
 .config/kitty/theme.conf
 .config/hypr/theme.conf

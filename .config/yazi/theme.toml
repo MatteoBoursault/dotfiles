@@ -1,0 +1,15 @@
+# theme.toml / flavor.toml
+[git]
+unknown_sign = " "
+ignored_sign = " "
+updated_sign = " "
+clean_sign = " "
+untracked_sign = "U"
+modified_sign = "M"
+deleted_sign = "D"
+added_sign = "A"
+
+untracked = { fg = "yellow" }
+modified = { fg = "blue" }
+deleted = { fg = "red" }
+added = { fg = "green" }

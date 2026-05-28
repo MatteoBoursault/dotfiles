@@ -1,0 +1,101 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+"""
+right_format = """
+$duration\
+$jobs\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$docker_context\
+$time\
+$battery
+"""
+add_newline = false
+
+scan_timeout = 1000
+command_timeout = 7000
+
+[line_break]
+disabled = false
+
+[character]
+success_symbol = '[➜](bold green) '
+error_symbol = '[✗](bold red) '
+
+[cmd_duration]
+disabled = false
+min_time = 20
+style = 'black'
+format = '[$duration]($style) '
+
+[jobs]
+disabled = false
+threshold = 1
+style = 'black'
+format = '[$number]($style) '
+
+[docker_context]
+style = 'blue'
+format = '[$context]($style)'
+
+[directory]
+truncation_length = 3
+truncation_symbol = ' '
+truncate_to_repo = true
+style = 'yellow'
+format = '[$path]($style) '
+
+[git_branch]
+truncation_length = 24
+truncation_symbol = ''
+style = 'foreground'
+format = '[$branch]($style) '
+
+[git_status]
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+style = 'white'
+format = '([\[$all_status$ahead_behind\]]($style) )'
+
+[git_state]
+style = 'magenta'
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+
+[time]
+disabled = false
+time_format = '%T'
+style = 'cyan'
+format = '[$time]($style) '
+
+[battery]
+disabled = false
+full_symbol = '󰁹'
+charging_symbol = '󰂄'
+discharging_symbol = '󰂃'
+unknown_symbol = '󰂑'
+empty_symbol = '󰂎'
+format = '[$symbol$percentage]($style)'
+
+[[battery.display]]
+threshold = 100
+style = 'green'
+discharging_symbol = '󰁹'
+
+[[battery.display]]
+threshold = 80
+style = 'green'
+discharging_symbol = '󰁽'
+
+[[battery.display]]
+threshold = 30
+style = 'bold yellow'
+discharging_symbol = '󰁽'
+
+[[battery.display]]
+threshold = 10
+style = 'bold red'
+discharging_symbol = '󰂎'
