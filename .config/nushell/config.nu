@@ -41,6 +41,8 @@ $env.path ++= ["~/.local/bin/"]
 
 $env.STARSHIP_CONFIG = ($env.HOME | path join ".config/starship/starship.toml")
 
+$env.FZF_DEFAULT_OPT = "--walker-root=/"
+
 $env.PROMPT_INDICATOR = ""
 $env.PROMPT_INDICATOR_VI_INSERT = ""
 $env.PROMPT_INDICATOR_VI_NORMAL = ""
@@ -59,29 +61,36 @@ carapace _carapace nushell | save -f ($nu.data-dir | path join "vendor/autoload/
 zoxide init nushell | save -f ($nu.data-dir | path join "vendor/autoload/zoxide.nu") # cd
 starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu") # prompt
 
+source ($nu.data-dir | path join "vendor/autoload/zoxide.nu")
+alias cd = __zoxide_z
+
 # ==============================================================================
 # OUTILS
 # ==============================================================================
 
-alias ps = procs                           # procs (ps)
-alias htop = btop                          # btop (htop)
-alias netw = bandwich                      # bandwich => network monitoring
+alias ll = eza -la --icons --git --group-directories-first            # eza (ls)
+alias lt = eza -la --icons --tree --level=2 --group-directories-first
+alias ls = eza --icons --group-directories-first
 
-alias ddocker = lazydocker                 # lazydocker (docker)
-alias ggit = lazygit                       # lazygit (git)
+alias ps = procs                                                      # procs (ps)
+alias htop = btop                                                     # btop (htop)
+alias netw = bandwich                                                 # bandwich => network monitoring
 
-alias find = fd                            # fd (find)
+alias ddocker = lazydocker                                            # lazydocker (docker)
+alias ggit = lazygit                                                  # lazygit (git)
+
+alias find = fd                                                       # fd (find)
 def ffind [ file_name ] {
   fd $file_name / --hidden --no-ignore
 }
-alias grep = rg                            # rg (grep)
+alias grep = rg                                                       # rg (grep)
 def rrg [ foo ] {
   rg $foo --hidden --no-ignore
 }
 
-alias mman = tldr                          # tldr (man)
-alias regex = grex                         # grex => regex generator
-alias xx = handlr open                     # open
+alias mman = tldr                                                     # tldr (man)
+alias regex = grex                                                    # grex => regex generator
+alias xx = handlr open                                                # open
 
 # ==============================================================================
 # SCRIPTS
