@@ -5,7 +5,8 @@ layout {
     border {
         width 2
     }
-
+    
+    background-color "transparent"
     center-focused-column "never"
 
     preset-column-widths {

@@ -1,5 +1,5 @@
 window-rule {
-    open-fullscreen true
+    open-maximized true
 
     background-effect {
       xray false
